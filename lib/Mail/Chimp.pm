@@ -1,7 +1,7 @@
 package Mail::Chimp;
 use Mouse;
 
-our $VERSION     = '0.1';
+our $VERSION     = '0.11';
 
 =head1 NAME
 
