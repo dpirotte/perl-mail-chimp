@@ -12,7 +12,7 @@ Mail::Chimp::API - Perl wrapper around the Mailchimp v1.1 API
   use strict;
   use Mail::Chimp::API;
 
-  my $chimp = Mail::Chimp::API->new($username, $password);
+  my $chimp = Mail::Chimp::API->new(username => $username, password => $password);
 
   my $campaigns   = $chimp->campaigns;
   my $lists       = $chimp->lists;
@@ -58,34 +58,41 @@ This library is free software; you can redistribute it and/or modify it under th
 
 Dave Pirotte (dpirotte@gmail.com)
 
+Drew Taylor (drew@drewtaylor.com)
+
 =cut
 
 use XMLRPC::Lite;
 
-use constant MAILCHIMP_API => 'http://api.mailchimp.com/1.1/';
-
 has 'username' => (is => 'ro', isa => 'Str', required => 1);
 has 'password' => (is => 'ro', isa => 'Str', required => 1);
-has 'key'      => (is => 'ro', isa => 'Str');
-has 'api'      => (is => 'ro', isa => 'XMLRPC::Lite');
+has 'key'      => (is => 'rw', isa => 'Str');
+has 'api'      => (is => 'rw', isa => 'XMLRPC::Lite');
+has 'api_version' => (is => 'ro', isa => 'Num', default => 1.1);
+has 'api_url'     => (is => 'rw', isa => 'Str');
+has 'use_secure'  => (is => 'rw', isa => 'Bool', default => 1);
 
 sub BUILD {
-  $_[0]->{api} = XMLRPC::Lite->proxy(MAILCHIMP_API);
-  $_[0]->{key} = $_[0]->_call('login', $_[0]->username, $_[0]->password);
+  my $self = shift;
+  my $protocol = 'http';
+  $protocol .= 's' if $self->use_secure();
+  $self->api_url( "$protocol://api.mailchimp.com/" . $self->api_version() . '/' );
+  $self->api( XMLRPC::Lite->proxy( $self->api_url() ) );
+  $self->key( $self->_call( 'login', $self->username(), $self->password() ) );
 }
 
 sub _call {
   my $self = shift;
-  my $call = $self->api->call(@_);
+  my $call = $self->api->call( @_ );
   return $call->result
-    || confess(sprintf("MailChimp Error %d: %s", $call->fault->{faultCode}, $call->fault->{faultString}));
+    || confess( sprintf( "MailChimp Error %d: %s", $call->fault->{faultCode}, $call->fault->{faultString} ) );
 }
 
 {
   no strict 'refs';
   sub _make_api_method { 
     my ($class, $method) = @_;
-    *{"${class}::$method"} = sub { my ($self, @args) = @_; $self->_call($method, $self->key, @args) };
+    *{"${class}::$method"} = sub { my $self = shift; $self->_call( $method, $self->key, @_ ) };
   }
 }
 
@@ -141,7 +148,7 @@ my @api_methods = qw(
   lists
 );
 
-__PACKAGE__->_make_api_method($_) for @api_methods;
+__PACKAGE__->_make_api_method( $_ ) for @api_methods;
 
 
 
