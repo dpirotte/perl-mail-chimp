@@ -1,7 +1,7 @@
 package Mail::Chimp;
 use Mouse;
 
-our $VERSION     = '0.11';
+our $VERSION     = '0.12';
 
 =head1 NAME
 
@@ -30,6 +30,8 @@ This library is free software; you can redistribute it and/or modify it under th
 =head1 AUTHOR
 
 Dave Pirotte (dpirotte@gmail.com)
+
+Drew Taylor (drew@drewtaylor.com)
 
 =cut
 
