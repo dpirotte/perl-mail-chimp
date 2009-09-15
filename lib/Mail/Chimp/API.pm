@@ -5,17 +5,21 @@ our $VERSION = '0.12';
 
 =head1 NAME
 
-Mail::Chimp::API - Perl wrapper around the Mailchimp v1.1 API
+Mail::Chimp::API - Perl wrapper around the Mailchimp API
 
 =head1 SYNOPSIS
 
   use strict;
   use Mail::Chimp::API;
 
-  my $chimp = Mail::Chimp::API->new(apikey => $apikey);
+  my $chimp = Mail::Chimp::API->new(apikey      => $apikey,
+                                    api_version => 1.2);
 
   # or if you have no apikey setup:
-  # my $chimp = Mail::Chimp::API->new(username => $username, password => $password);
+  # my $chimp = Mail::Chimp::API->new(username    => $username,
+  #                                   password    => $password,
+  #                                   api_version => 1.1,
+  #                                  );
 
   my $apikey      = $chimp->apikey;   # generated on first login if none was setup
 
@@ -27,15 +31,17 @@ Mail::Chimp::API - Perl wrapper around the Mailchimp v1.1 API
 
 =head1 DESCRIPTION
 
-Mail::Chimp::API is a simple Perl wrapper around the MailChimp v1.1
-API. The object exposes the MailChimp XML-RPC methods and confesses
+Mail::Chimp::API is a simple Perl wrapper around the MailChimp API.
+The object exposes the MailChimp XML-RPC methods and confesses
 fault codes/messages when errors occur.  Further, it keeps track of
 your API key for you so you do not need to enter it each time.
 
 Method parameters are passed straight through, in order, to MailChimp.
-Thus, you do need to understand the MailChimp v1.1 API as documented
-at <http://www.mailchimp.com/api/1.1/> so that you will know the
+Thus, you do need to understand the MailChimp API as documented
+at <http://api.mailchimp.com/> so that you will know the
 appropriate parameters to pass to each method.
+
+This API has been tested with version 1.0 and 1.1 of the API.
 
 =head1 NOTES
 
@@ -59,7 +65,7 @@ example:
 =head1 SEE ALSO
 
   XMLRPC::Lite
-  <http://www.mailchimp.com/api/1.1/>
+  <http://www.mailchimp.com/api/1.2/>
 
 =head1 COPYRIGHT
 
@@ -73,6 +79,8 @@ Dave Pirotte (dpirotte@gmail.com)
 
 Drew Taylor (drew@drewtaylor.com)
 
+Ask Bjørn Hansen (ask@develooper.com)
+
 =cut
 
 use XMLRPC::Lite;
@@ -81,7 +89,7 @@ has 'username'    => (is => 'ro', isa => 'Str');
 has 'password'    => (is => 'ro', isa => 'Str');
 has 'apikey'      => (is => 'rw', isa => 'Str');
 has 'api'         => (is => 'rw', isa => 'XMLRPC::Lite');
-has 'api_version' => (is => 'ro', isa => 'Num', default => 1.1);
+has 'api_version' => (is => 'ro', isa => 'Num', required => 1);
 has 'api_url'     => (is => 'rw', isa => 'Str');
 has 'use_secure'  => (is => 'rw', isa => 'Bool', default => 1);
 
@@ -149,6 +157,7 @@ my @api_methods = qw(
   
   generateText
   getAffiliateInfo
+  getAccountDetails
   inlineCss
   ping
 
@@ -157,14 +166,19 @@ my @api_methods = qw(
   listInterestGroupAdd
   listInterestGroupDel
   listInterestGroups
+  listInterestGroupsUpdate
   listMemberInfo
   listMembers
   listMergeVarAdd
   listMergeVarDel
   listMergeVars
+  listMergeVarsUpdate
   listSubscribe
   listUnsubscribe
   listUpdateMember
+  listWebhookAdd
+  listWebhookDel
+  listWebhooks
   lists
 );
 

@@ -1,11 +1,20 @@
 NAME
-    Mail::Chimp::API - Perl wrapper around the Mailchimp v1.1 API
+    Mail::Chimp::API - Perl wrapper around the Mailchimp API
 
 SYNOPSIS
       use strict;
       use Mail::Chimp::API;
 
-      my $chimp = Mail::Chimp::API->new($username, $password);
+      my $chimp = Mail::Chimp::API->new(apikey      => $apikey,
+                                        api_version => 1.2);
+
+      # or if you have no apikey setup:
+      # my $chimp = Mail::Chimp::API->new(username    => $username,
+      #                                   password    => $password,
+      #                                   api_version => 1.1,
+      #                                  );
+
+      my $apikey      = $chimp->apikey;   # generated on first login if none was setup
 
       my $campaigns   = $chimp->campaigns;
       my $lists       = $chimp->lists;
@@ -14,15 +23,17 @@ SYNOPSIS
       print 'success' if $chimp->listSubscribe($lists->[0]->{id}, 'someone@somewhere.com', {}, 1);
 
 DESCRIPTION
-    Mail::Chimp::API is a simple Perl wrapper around the MailChimp v1.1 API.
-    The object exposes the MailChimp XML-RPC methods and confesses fault
+    Mail::Chimp::API is a simple Perl wrapper around the MailChimp API. The
+    object exposes the MailChimp XML-RPC methods and confesses fault
     codes/messages when errors occur. Further, it keeps track of your API
     key for you so you do not need to enter it each time.
 
     Method parameters are passed straight through, in order, to MailChimp.
-    Thus, you do need to understand the MailChimp v1.1 API as documented at
-    <http://www.mailchimp.com/api/1.1/> so that you will know the
-    appropriate parameters to pass to each method.
+    Thus, you do need to understand the MailChimp API as documented at
+    <http://api.mailchimp.com/> so that you will know the appropriate
+    parameters to pass to each method.
+
+    This API has been tested with version 1.0 and 1.1 of the API.
 
 NOTES
     If you find yourself getting '-32602' errors, you are probably missing a
@@ -36,16 +47,13 @@ NOTES
       # The {} is required by MailChimp to indicate that you do not want any MergeVars
       print 'success' if $chimp->listSubscribe($lists->[0]->{id}, 'someone@somewhere.com', {}, 1);
 
-    Also, the only security method implemented is login. This is likely to
-    change at some point in the future.
-
 DEPENDENCIES
       Mouse
       XMLRPC::Lite
 
 SEE ALSO
       XMLRPC::Lite
-      <http://www.mailchimp.com/api/1.1/>
+      <http://www.mailchimp.com/api/1.2/>
 
 COPYRIGHT
     Copyright (C) 2009 Dave Pirotte. All rights reserved.
@@ -55,4 +63,8 @@ COPYRIGHT
 
 AUTHOR
     Dave Pirotte (dpirotte@gmail.com)
+
+    Drew Taylor (drew@drewtaylor.com)
+
+    Ask Bjørn Hansen (ask@develooper.com)
 

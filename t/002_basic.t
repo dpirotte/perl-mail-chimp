@@ -16,6 +16,7 @@ else {
 use_ok( 'Mail::Chimp::API' );
 
 my $chimp = Mail::Chimp::API->new( 
+    api_version => 1.2,
     $ENV{MAILCHIMP_APIKEY}
     ? (apikey   => $ENV{MAILCHIMP_APIKEY})
     : (username => $ENV{MAILCHIMP_USERNAME},

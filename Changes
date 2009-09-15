@@ -1,5 +1,8 @@
 Revision history for Perl module Mail::Chimp
 
+  - Add support for v1.2 of the API (Ask)
+  - Require api_version to be specified to new() to make
+    upgrades easier / more reliable (Ask)
   - Add support for providing an api key instead of username
     and password (Ask Bjørn Hansen).
 
