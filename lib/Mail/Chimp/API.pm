@@ -22,13 +22,22 @@ Mail::Chimp::API - Perl wrapper around the Mailchimp v1.1 API
 
 =head1 DESCRIPTION
 
-Mail::Chimp::API is a simple Perl wrapper around the MailChimp v1.1 API. The object exposes the MailChimp XML-RPC methods and confesses fault codes/messages when errors occur.  Further, it keeps track of your API key for you so you do not need to enter it each time.  
+Mail::Chimp::API is a simple Perl wrapper around the MailChimp v1.1
+API. The object exposes the MailChimp XML-RPC methods and confesses
+fault codes/messages when errors occur.  Further, it keeps track of
+your API key for you so you do not need to enter it each time.
 
-Method parameters are passed straight through, in order, to MailChimp.  Thus, you do need to understand the MailChimp v1.1 API as documented at <http://www.mailchimp.com/api/1.1/> so that you will know the appropriate parameters to pass to each method.
+Method parameters are passed straight through, in order, to MailChimp.
+Thus, you do need to understand the MailChimp v1.1 API as documented
+at <http://www.mailchimp.com/api/1.1/> so that you will know the
+appropriate parameters to pass to each method.
 
 =head1 NOTES
 
-If you find yourself getting '-32602' errors, you are probably missing a required (even if empty) hash.  The API documentation should be your first destination to verify the validity of your parameters.  For example:
+If you find yourself getting '-32602' errors, you are probably missing
+a required (even if empty) hash.  The API documentation should be your
+first destination to verify the validity of your parameters.  For
+example:
 
   # MailChimp Error -32602: server error. invalid method parameters
   print 'fail'    if $chimp->listSubscribe($lists->[0]->{id}, 'someone@somewhere.com');
@@ -36,7 +45,8 @@ If you find yourself getting '-32602' errors, you are probably missing a require
   # The {} is required by MailChimp to indicate that you do not want any MergeVars
   print 'success' if $chimp->listSubscribe($lists->[0]->{id}, 'someone@somewhere.com', {}, 1);
 
-Also, the only security method implemented is login.  This is likely to change at some point in the future.
+Also, the only security method implemented is login.  This is likely
+to change at some point in the future.
 
 =head1 DEPENDENCIES
 
