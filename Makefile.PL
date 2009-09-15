@@ -6,7 +6,7 @@ WriteMakefile(
     AUTHOR       => 'Dave Pirotte (dpirotte@gmail.com)',
     ABSTRACT     => 'Perl wrapper around the Mailchimp v1.1 API',
     PREREQ_PM    => {
-                     'Mouse'        => '0.16',
+                     'Moose'        => '0.88',
                      'XMLRPC::Lite' => '0.710.06',
                      'Test::Simple' => '0.44',
                     },

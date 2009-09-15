@@ -1,5 +1,5 @@
 package Mail::Chimp::API;
-use Mouse;
+use Moose;
 
 our $VERSION = '0.12';
 

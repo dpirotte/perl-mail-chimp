@@ -1,5 +1,4 @@
 package Mail::Chimp;
-use Mouse;
 
 our $VERSION     = '0.12';
 
