@@ -12,7 +12,12 @@ Mail::Chimp::API - Perl wrapper around the Mailchimp v1.1 API
   use strict;
   use Mail::Chimp::API;
 
-  my $chimp = Mail::Chimp::API->new(username => $username, password => $password);
+  my $chimp = Mail::Chimp::API->new(apikey => $apikey);
+
+  # or if you have no apikey setup:
+  # my $chimp = Mail::Chimp::API->new(username => $username, password => $password);
+
+  my $apikey      = $chimp->apikey;   # generated on first login if none was setup
 
   my $campaigns   = $chimp->campaigns;
   my $lists       = $chimp->lists;
@@ -45,8 +50,6 @@ example:
   # The {} is required by MailChimp to indicate that you do not want any MergeVars
   print 'success' if $chimp->listSubscribe($lists->[0]->{id}, 'someone@somewhere.com', {}, 1);
 
-Also, the only security method implemented is login.  This is likely
-to change at some point in the future.
 
 =head1 DEPENDENCIES
 
@@ -74,21 +77,28 @@ Drew Taylor (drew@drewtaylor.com)
 
 use XMLRPC::Lite;
 
-has 'username' => (is => 'ro', isa => 'Str', required => 1);
-has 'password' => (is => 'ro', isa => 'Str', required => 1);
-has 'key'      => (is => 'rw', isa => 'Str');
-has 'api'      => (is => 'rw', isa => 'XMLRPC::Lite');
+has 'username'    => (is => 'ro', isa => 'Str');
+has 'password'    => (is => 'ro', isa => 'Str');
+has 'apikey'      => (is => 'rw', isa => 'Str');
+has 'api'         => (is => 'rw', isa => 'XMLRPC::Lite');
 has 'api_version' => (is => 'ro', isa => 'Num', default => 1.1);
 has 'api_url'     => (is => 'rw', isa => 'Str');
 has 'use_secure'  => (is => 'rw', isa => 'Bool', default => 1);
 
 sub BUILD {
   my $self = shift;
+
+  die 'apikey or username and password is required'
+    unless ($self->apikey or ($self->username and $self->password));
+
   my $protocol = 'http';
   $protocol .= 's' if $self->use_secure();
   $self->api_url( "$protocol://api.mailchimp.com/" . $self->api_version() . '/' );
   $self->api( XMLRPC::Lite->proxy( $self->api_url() ) );
-  $self->key( $self->_call( 'login', $self->username(), $self->password() ) );
+
+  unless ($self->apikey) {
+      $self->apikey( $self->_call( 'login', $self->username(), $self->password() ) );
+  }
 }
 
 sub _call {
@@ -102,7 +112,7 @@ sub _call {
   no strict 'refs';
   sub _make_api_method { 
     my ($class, $method) = @_;
-    *{"${class}::$method"} = sub { my $self = shift; $self->_call( $method, $self->key, @_ ) };
+    *{"${class}::$method"} = sub { my $self = shift; $self->_call( $method, $self->apikey, @_ ) };
   }
 }
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Mail::Chimp
 
+  - Add support for providing an api key instead of username
+    and password (Ask Bjørn Hansen).
+
 0.12 April 11, 2009
   - Add more flexibility for API version (Drew Taylor)
 
