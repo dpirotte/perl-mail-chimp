@@ -1,6 +1,8 @@
 Revision history for Perl module Mail::Chimp
 
-0.01 Wed Mar 11 06:45:44 2009
-    - original version; created by ExtUtils::ModuleMaker 0.51
+0.12 April 11, 2009
+  - Add more flexibility for API version (Drew Taylor)
 
+0.11 March 15, 2009
+  - First public release
 
