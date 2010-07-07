@@ -1,7 +1,148 @@
 package Mail::Chimp::API;
+use strict;
+use warnings;
 use Moose;
+use XMLRPC::Lite;
+use Data::Dumper;
 
-our $VERSION = '0.12';
+our $VERSION = '0.2.1';
+
+
+has 'username'      => (is => 'ro', isa => 'Str');
+has 'password'      => (is => 'ro', isa => 'Str');
+has 'api'           => (is => 'rw', isa => 'XMLRPC::Lite');
+has 'api_version'   => (is => 'ro', isa => 'Num', default => 1.2);
+has 'api_url'       => (is => 'ro', isa => 'Str');
+has 'apikey'        => (is => 'rw', isa => 'Str');
+has 'use_secure'    => (is => 'ro', isa => 'Bool', default => 1);
+has 'datacenter'    => (is => 'ro', isa => 'Str', default => 'us1');
+has 'output_format' => (is => 'rw', isa => 'Str', default => 'json');
+
+
+sub BUILD {
+    my ( $self ) = @_;
+    
+    die 'apikey or username and password is required'
+        unless ($self->apikey or ($self->username and $self->password));
+    my $url = 'http';
+    $url .= 's' if $self->use_secure();
+    $url .= "://" . $self->datacenter() . ".api.mailchimp.com/" . $self->api_version() . '/';
+    warn "# $url\n";
+    $self->api_url( $url );
+    $self->api( XMLRPC::Lite->proxy( $url ) );
+    unless ($self->apikey) {
+        $self->apikey( $self->_call( 'login', $self->username(), $self->password() ) );
+    }
+}
+
+sub _call {
+    my $self = shift;
+
+    my $call = $self->api->call( @_ );
+    return $call->result
+        || confess( sprintf( "MailChimp Error %d: %s", $call->fault->{faultCode}, $call->fault->{faultString} ) );
+}
+
+sub all_lists {
+    my ( $self ) = @_;
+
+    my $lists = $self->_call( 'lists', $self->apikey );
+    require Mail::Chimp::List;
+    return [ map { Mail::Chimp::List->new( _api => $self, %$_ ) } @$lists ];
+}
+
+sub get_list {
+    my ( $self, $id ) = @_;
+    my $lists = $self->get_lists();
+    return grep { $_->id() == $id or $_->name() eq $id } @$lists;
+}
+
+
+{
+    no strict 'refs';
+    sub _make_api_method { 
+        my ($class, $method) = @_;
+        *{"${class}::$method"} = sub { my $self = shift; $self->_call( $method, $self->apikey, @_ ) };
+    }
+}
+
+my @api_methods = qw(
+    campaignContent
+    campaignCreate
+    campaignDelete
+    campaignEcommAddOrder
+    campaignFolders
+    campaignPause
+    campaignReplicate
+    campaignResume
+    campaignSchedule
+    campaignSegmentTest
+    campaignSendNow
+    campaignSendTest
+    campaignTemplates
+    campaignUnschedule
+    campaignUpdate
+    campaigns
+
+    campaignAbuseReports
+    campaignAdvice
+    campaignAnalytics
+    campaignBounceMessages
+    campaignClickStats
+    campaignEcommOrders
+    campaignEepUrlStats
+    campaignEmailDomainPerformance
+    campaignGeoOpens
+    campaignGeoOpensForCountry
+    campaignHardBounces
+    campaignSoftBounces
+    campaignStats
+    campaignUnsubscribes
+
+    campaignClickDetailAIM
+    campaignEmailStatsAIM
+    campaignEmailStatsAIMAll
+    campaignNotOpenedAIM
+    campaignOpenedAIM
+
+    chimpChatter
+    createFolder
+    exommAddOrder
+    generateText
+    getAccountDetails
+    getAffiliateInfo
+    inlineCss
+    listsForEmail
+    ping
+
+    listAbuseReports
+    listBatchSubscribe
+    listBatchUnsubscribe
+    listGrowthHistory
+    listInterestGroupAdd
+    listInterestGroupDel
+    listInterestGroupUpdate
+    listInterestGroups
+    listMemberInfo
+    listMembers
+    listMergeVarAdd
+    listMergeVarDel
+    listMergeVarUpdate
+    listMergeVars
+    listSubscribe
+    listUnsubscribe
+    listUpdateMember
+    listWebhookAdd
+    listWebhookDel
+    listWebhooks
+    lists
+    
+    apikeyAdd
+    apikeyExpire
+    apikeys
+);
+
+__PACKAGE__->_make_api_method( $_ ) for @api_methods;
 
 =head1 NAME
 
@@ -41,7 +182,7 @@ Thus, you do need to understand the MailChimp API as documented
 at <http://api.mailchimp.com/> so that you will know the
 appropriate parameters to pass to each method.
 
-This API has been tested with version 1.0 and 1.1 of the API.
+This API has been tested with version 1.0, 1.1 and 1.2 of the API.
 
 =head1 NOTES
 
@@ -59,7 +200,7 @@ example:
 
 =head1 DEPENDENCIES
 
-  Mouse
+  Moose
   XMLRPC::Lite
 
 =head1 SEE ALSO
@@ -82,108 +223,5 @@ Drew Taylor (drew@drewtaylor.com)
 Ask Bjørn Hansen (ask@develooper.com)
 
 =cut
-
-use XMLRPC::Lite;
-
-has 'username'    => (is => 'ro', isa => 'Str');
-has 'password'    => (is => 'ro', isa => 'Str');
-has 'apikey'      => (is => 'rw', isa => 'Str');
-has 'api'         => (is => 'rw', isa => 'XMLRPC::Lite');
-has 'api_version' => (is => 'ro', isa => 'Num', required => 1);
-has 'api_url'     => (is => 'rw', isa => 'Str');
-has 'use_secure'  => (is => 'rw', isa => 'Bool', default => 1);
-
-sub BUILD {
-  my $self = shift;
-
-  die 'apikey or username and password is required'
-    unless ($self->apikey or ($self->username and $self->password));
-
-  my $protocol = 'http';
-  $protocol .= 's' if $self->use_secure();
-  $self->api_url( "$protocol://api.mailchimp.com/" . $self->api_version() . '/' );
-  $self->api( XMLRPC::Lite->proxy( $self->api_url() ) );
-
-  unless ($self->apikey) {
-      $self->apikey( $self->_call( 'login', $self->username(), $self->password() ) );
-  }
-}
-
-sub _call {
-  my $self = shift;
-  my $call = $self->api->call( @_ );
-  return $call->result
-    || confess( sprintf( "MailChimp Error %d: %s", $call->fault->{faultCode}, $call->fault->{faultString} ) );
-}
-
-{
-  no strict 'refs';
-  sub _make_api_method { 
-    my ($class, $method) = @_;
-    *{"${class}::$method"} = sub { my $self = shift; $self->_call( $method, $self->apikey, @_ ) };
-  }
-}
-
-my @api_methods = qw(
-  campaignContent
-  campaignCreate
-  campaignDelete
-  campaignEcommAddOrder
-  campaignFolders
-  campaignPause
-  campaignReplicate
-  campaignResume
-  campaignSchedule
-  campaignSegmentTest
-  campaignSendNow
-  campaignSendTest
-  campaignTemplates
-  campaignUnschedule
-  campaignUpdate
-  campaigns
-  
-  campaignAbuseReports
-  campaignClickStats
-  campaignHardBounces
-  campaignSoftBounces
-  campaignStats
-  campaignUnsubscribes
-  
-  campaignClickDetailAIM
-  campaignEmailStatsAIM
-  campaignEmailStatsAIMAll
-  campaignNotOpenedAIM
-  campaignOpenedAIM
-  
-  generateText
-  getAffiliateInfo
-  getAccountDetails
-  inlineCss
-  ping
-
-  listBatchSubscribe
-  listBatchUnsubscribe
-  listInterestGroupAdd
-  listInterestGroupDel
-  listInterestGroups
-  listInterestGroupsUpdate
-  listMemberInfo
-  listMembers
-  listMergeVarAdd
-  listMergeVarDel
-  listMergeVars
-  listMergeVarsUpdate
-  listSubscribe
-  listUnsubscribe
-  listUpdateMember
-  listWebhookAdd
-  listWebhookDel
-  listWebhooks
-  lists
-);
-
-__PACKAGE__->_make_api_method( $_ ) for @api_methods;
-
-
 
 1;
