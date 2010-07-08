@@ -7,7 +7,7 @@ our $VERSION = '0.2.1';
 
 
 has '_api'                         => (is => 'ro', isa => 'Mail::Chimp::API');
-has 'id'                           => (is => 'ro', isa => 'Int');
+has 'id'                           => (is => 'ro', isa => 'Str');
 has 'web_id'                       => (is => 'ro', isa => 'Int');
 has 'name'                         => (is => 'ro', isa => 'Str');
 has 'date_created'                 => (is => 'ro', isa => DateTime, coerce => 1);
@@ -18,7 +18,7 @@ has 'default_from_name'            => (is => 'ro', isa => 'Str');
 has 'default_from_email'           => (is => 'ro', isa => 'Str');
 has 'default_subject'              => (is => 'ro', isa => 'Str');
 has 'default_language'             => (is => 'ro', isa => 'Str');
-has 'list_rating'                  => (is => 'ro', isa => 'Float');
+has 'list_rating'                  => (is => 'ro', isa => 'Num');
 has 'member_count_since_send'      => (is => 'ro', isa => 'Int');
 has 'unsubscribe_since_send_count' => (is => 'ro', isa => 'Int');
 has 'cleaned_count_since_send'     => (is => 'ro', isa => 'Int');
@@ -36,12 +36,12 @@ sub abuse_reports {
 }
 
 sub batch_subscribe {
-    my ( $slf, $batch, $double_optin, $update_existing, $replace_interests ) = @_;
+    my ( $self, $batch, $double_optin, $update_existing, $replace_interests ) = @_;
     return $self->_call( 'listBatchSubscribe', $batch, $double_optin, $update_existing, $replace_interests );
 }
 
 sub batch_unsubscribe {
-    my ( $slf, $addresses, $delete_member, $send_goodbye, $send_notify ) = @_;
+    my ( $self, $addresses, $delete_member, $send_goodbye, $send_notify ) = @_;
     return $self->_call( 'listBatchUnsubscribe', $addresses, $delete_member, $send_goodbye, $send_notify );
 }
 
