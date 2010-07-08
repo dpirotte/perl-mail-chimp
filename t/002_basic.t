@@ -28,6 +28,8 @@ my $lists = $chimp->lists;
 diag(Dumper $lists);
 #TODO 
 #  Need to test the test bellow to make sure it still works. 
+#  Not really happy with these test. I know we can not really test the funcitons, but we need better tests
+#  then these.
 #my $chimp = Mail::Chimp::API->new( api_key => $ENV{MAILCHIMP_APIKEY}, debug => $ENV{MAILCHIMP_DEBUG} );
 #
 #my $lists = $chimp->all_lists();
@@ -36,7 +38,7 @@ diag(Dumper $lists);
 #    my $list = $lists->[0];
 #    diag("List name: ".$list->name);
 #    my $email = 'drew@drewtaylor.com';
-#    # my $vars = {};
+#    my $vars = {};
 #    my $success = $list->subscribe_address( $email );
 #    diag("Added $email: $success");
 #}

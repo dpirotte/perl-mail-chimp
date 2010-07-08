@@ -12,7 +12,7 @@ has 'username'      => (is => 'ro', isa => 'Str');
 has 'password'      => (is => 'ro', isa => 'Str');
 has 'api'           => (is => 'rw', isa => 'XMLRPC::Lite');
 has 'api_version'   => (is => 'ro', isa => 'Num', default => 1.2);
-has 'api_url'       => (is => 'ro', isa => 'Str');
+has 'api_url'       => (is => 'rw', isa => 'Str');
 has 'apikey'        => (is => 'rw', isa => 'Str');
 has 'use_secure'    => (is => 'ro', isa => 'Bool', default => 1);
 has 'datacenter'    => (is => 'ro', isa => 'Str', default => 'us1');
