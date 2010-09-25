@@ -1,6 +1,8 @@
 Changes
 lib/Mail/Chimp.pm
+lib/Mail/Chimp/AbuseReport.pm
 lib/Mail/Chimp/API.pm
+lib/Mail/Chimp/List.pm
 LICENSE
 Makefile
 Makefile.PL
