@@ -3,7 +3,7 @@ Revision history for Perl module Mail::Chimp
 0.50
   - Add wrappers for all list related methods (Drew)
   - Switch to Moose (Drew)
-  - Various bugfixes and tweaks (Guatam Dey)
+  - Various bugfixes and tweaks (Gautam Dey)
   - Add support for v1.2 of the API (Ask)
   - Require api_version to be specified to new() to make
     upgrades easier / more reliable (Ask)
